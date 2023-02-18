@@ -1,3 +1,5 @@
+import typewise_constants as tc
+
 
 def infer_breach(value, lowerLimit, upperLimit):
   if value < lowerLimit:
@@ -8,27 +10,33 @@ def infer_breach(value, lowerLimit, upperLimit):
 
 
 def classify_temperature_breach(coolingType, temperatureInC):
-  lowerLimit = 0
-  upperLimit = 0
-  if coolingType == 'PASSIVE_COOLING':
-    lowerLimit = 0
-    upperLimit = 35
-  elif coolingType == 'HI_ACTIVE_COOLING':
-    lowerLimit = 0
-    upperLimit = 45
-  elif coolingType == 'MED_ACTIVE_COOLING':
-    lowerLimit = 0
-    upperLimit = 40
-  return infer_breach(temperatureInC, lowerLimit, upperLimit)
+  limits = temperature_breach_limit(coolingType)
+  return infer_breach(
+    temperatureInC,
+    limits['lowerLimit'],
+    limits['upperLimit']
+  )
 
 
 def check_and_alert(alertTarget, batteryChar, temperatureInC):
-  breachType =\
-    classify_temperature_breach(batteryChar['coolingType'], temperatureInC)
-  if alertTarget == 'TO_CONTROLLER':
-    send_to_controller(breachType)
-  elif alertTarget == 'TO_EMAIL':
-    send_to_email(breachType)
+  if alertTarget == tc.ALERT_TARGET[0]:
+    send_to_controller(
+      classify_temperature_breach(
+        batteryChar['coolingType'],
+        temperatureInC
+      )
+    )
+  elif alertTarget == tc.ALERT_TARGET[1]:
+    send_to_email(
+      classify_temperature_breach(
+        batteryChar['coolingType'],
+        temperatureInC
+      )
+    )
+  return classify_temperature_breach(
+    batteryChar['coolingType'],
+    temperatureInC
+  )
 
 
 def send_to_controller(breachType):
@@ -44,3 +52,7 @@ def send_to_email(breachType):
   elif breachType == 'TOO_HIGH':
     print(f'To: {recepient}')
     print('Hi, the temperature is too high')
+
+
+def temperature_breach_limit(coolingType):
+  return tc.COOLING_TYPE_LIMITS[coolingType]

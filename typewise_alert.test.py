@@ -1,10 +1,27 @@
 import unittest
-import typewise_alert
+import typewise_alert as ta
+import typewise_constants as tc
 
 
 class TypewiseTest(unittest.TestCase):
-  def test_infers_breach_as_per_limits(self):
-    self.assertTrue(typewise_alert.infer_breach(20, 50, 100) == 'TOO_LOW')
+
+  def test_check_and_alert(self):
+    for coolingType in tc.COOLING_TYPE:
+        for alertTarget in tc.ALERT_TARGET:
+          self.assertTrue(
+            ta.check_and_alert(
+              alertTarget,
+              {'coolingType': coolingType},
+              80
+            ) == 'TOO_HIGH'
+          )
+          self.assertTrue(
+            ta.check_and_alert(
+              alertTarget,
+              {'coolingType': coolingType},
+              -1
+            ) == 'TOO_LOW'
+          )
 
 
 if __name__ == '__main__':
