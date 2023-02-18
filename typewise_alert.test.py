@@ -22,6 +22,13 @@ class TypewiseTest(unittest.TestCase):
               -1
             ) == 'TOO_LOW'
           )
+          self.assertTrue(
+            ta.check_and_alert(
+              alertTarget,
+              {'coolingType': coolingType},
+              20
+            ) == 'NORMAL'
+          )
 
 
 if __name__ == '__main__':
